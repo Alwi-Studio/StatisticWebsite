@@ -30,7 +30,7 @@ jobs:
           node-version: "${{ env.NODE }}"
 
       - name: Install PNPM
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@v6
 
       - run: node --version
 
