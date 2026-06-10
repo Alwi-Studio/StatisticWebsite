@@ -1,0 +1,84 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - generic [ref=e4]:
+        - link "AlwiNation Statistics" [ref=e6] [cursor=pointer]:
+          - /url: .
+          - generic [ref=e9]: AlwiNation Statistics
+        - button "Enable dark mode" [ref=e13] [cursor=pointer]:
+          - img [ref=e14]
+    - banner [ref=e16]:
+      - list [ref=e22]:
+        - listitem [ref=e23]:
+          - link "Overview" [ref=e24] [cursor=pointer]:
+            - /url: ./#overview
+            - img [ref=e26]
+            - generic [ref=e31]: Overview
+        - listitem [ref=e32]:
+          - link "Top Staff" [ref=e33] [cursor=pointer]:
+            - /url: ./#top-staff
+            - img [ref=e35]
+            - generic [ref=e39]: Top Staff
+        - listitem [ref=e40]:
+          - link "Activity Graph" [ref=e41] [cursor=pointer]:
+            - /url: ./#activity-chart
+            - img [ref=e43]
+            - generic [ref=e45]: Activity Graph
+        - listitem [ref=e46]:
+          - link "Monthly Activity" [ref=e47] [cursor=pointer]:
+            - /url: ./#top-staff
+            - img [ref=e49]
+            - generic [ref=e53]: Monthly Activity
+    - generic [ref=e54]:
+      - generic "Page header" [ref=e55]:
+        - generic [ref=e58]:
+          - generic [ref=e59]: AlwiNation Statistics
+          - heading "Staff Activity" [level=2] [ref=e60]
+      - generic [ref=e63]:
+        - generic [ref=e66]:
+          - generic [ref=e67]: Tracked Staff
+          - generic [ref=e68]: ...
+          - generic [ref=e69]: Unique staff members recorded
+        - generic [ref=e72]:
+          - generic [ref=e73]: Total Chat Messages
+          - generic [ref=e74]: ...
+          - generic [ref=e75]: Messages recorded across all days
+        - generic [ref=e78]:
+          - generic [ref=e79]: Tracked Days
+          - generic [ref=e80]: ...
+          - generic [ref=e81]: Days containing staff activity
+        - generic [ref=e84]:
+          - generic [ref=e85]: Database Storage
+          - generic [ref=e86]: ...
+          - generic [ref=e87]: Staff activity table and indexes
+        - generic [ref=e91]:
+          - heading "Daily Activity" [level=3] [ref=e92]
+          - paragraph [ref=e93]: Chat messages and activity time during the selected month
+        - generic [ref=e97]:
+          - generic [ref=e98]:
+            - generic [ref=e99]:
+              - heading "Top Staff Activity" [level=3] [ref=e100]
+              - paragraph [ref=e101]: Ranked by chat messages for the selected month
+            - generic [ref=e102]:
+              - combobox "Activity month" [disabled] [ref=e103]:
+                - option "Loading months..." [selected]
+              - generic [ref=e104]: Loading...
+          - table [ref=e106]:
+            - rowgroup [ref=e107]:
+              - row "Rank Staff Member UUID Chat Messages Activity Time" [ref=e108]:
+                - columnheader "Rank" [ref=e109]
+                - columnheader "Staff Member" [ref=e110]
+                - columnheader "UUID" [ref=e111]
+                - columnheader "Chat Messages" [ref=e112]
+                - columnheader "Activity Time" [ref=e113]
+            - rowgroup [ref=e114]:
+              - row "Loading staff activity..." [ref=e115]:
+                - cell "Loading staff activity..." [ref=e116]
+      - contentinfo [ref=e117]:
+        - list [ref=e121]:
+          - listitem [ref=e122]:
+            - text: Copyright © 2026
+            - link "AlwiNation" [ref=e123] [cursor=pointer]:
+              - /url: .
+            - text: . All rights reserved.
+  - img

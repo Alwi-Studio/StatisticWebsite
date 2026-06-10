@@ -1,0 +1,8 @@
+[      32ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3000/dist/js/tabler-theme.min.js?1781042876:0
+[      32ms] [ERROR] Refused to execute script from 'http://localhost:3000/dist/js/tabler-theme.min.js?1781042876' because its MIME type ('text/html') is not executable, and strict MIME type checking is enabled. @ http://localhost:3000/#overview:0
+[      32ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3000/dist/js/tabler.min.js?1781042876:0
+[     197ms] [ERROR] Refused to execute script from 'http://localhost:3000/dist/js/tabler.min.js?1781042876' because its MIME type ('text/html') is not executable, and strict MIME type checking is enabled. @ http://localhost:3000/#overview:0
+[     250ms] [LOG] [11ty][05:12:22.856 UTC] Connected @ http://localhost:3000/.11ty/reload-client.js:20
+[  128295ms] [LOG] [11ty][05:14:30.901 UTC] Page reload initiated. @ http://localhost:3000/.11ty/reload-client.js:20
+[  128359ms] [LOG] [11ty][05:14:30.966 UTC] Connected @ http://localhost:3000/.11ty/reload-client.js:20
+[  128414ms] [LOG] [11ty][05:14:31.020 UTC] Connected @ http://localhost:3000/.11ty/reload-client.js:20

@@ -1,0 +1,25 @@
+<!-- BEGIN NAVBAR LOGO -->
+{%- assign prefix = include.prefix | default: 'navbar' -%}
+{%- capture class-attr %} class="{{ prefix }}-brand {{ prefix }}-brand-autodark{% if include.class %} {{ include.class }}{% endif %}"{%- endcapture -%}
+{%- if include.header -%}
+<div {{ class-attr }}>
+	<a href="{{ page | relative }}" aria-label="{{ site.title }}" class="text-decoration-none">
+{%- else -%}
+	<a href="{{ page | relative }}" aria-label="{{ site.title }}"{{ class-attr }}>
+{%- endif -%}
+		<span class="d-inline-flex align-items-center gap-2">
+			<span class="d-inline-flex align-items-center justify-content-center overflow-hidden rounded" style="width: 42px; height: 42px;">
+				<img src="{{ page | relative }}/alwination-logo.png" alt="" style="width: 46px; height: 46px; object-fit: cover; object-position: center 35%;">
+			</span>
+			<span>
+				<span class="fw-bold text-body">AlwiNation</span>
+				<span class="fw-normal text-secondary ms-1">Statistics</span>
+			</span>
+		</span>
+{%- if include.header -%}
+	</a>
+</div>
+{%- else -%}
+</a>
+{%- endif -%}
+<!-- END NAVBAR LOGO -->

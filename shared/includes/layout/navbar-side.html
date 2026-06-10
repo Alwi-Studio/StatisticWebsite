@@ -1,0 +1,12 @@
+<div class="navbar-nav flex-row{% if include.class %} {{ include.class }}{% endif %}">
+	<div class="d-none d-{{ include.breakpoint }}-flex">
+		<div class="nav-item">
+			<button type="button" class="nav-link px-0 hide-theme-dark border-0 bg-transparent" title="Enable dark mode" data-bs-toggle="tooltip" data-bs-placement="bottom" data-theme-toggle="dark">
+				{% include "ui/icon.html" icon="moon" %}
+			</button>
+			<button type="button" class="nav-link px-0 hide-theme-light border-0 bg-transparent" title="Enable light mode" data-bs-toggle="tooltip" data-bs-placement="bottom" data-theme-toggle="light">
+				{% include "ui/icon.html" icon="sun" %}
+			</button>
+		</div>
+	</div>
+</div>

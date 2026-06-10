@@ -1,0 +1,55 @@
+[   67306ms] [LOG] [11ty][05:16:13.144 UTC] Page reload initiated. @ http://localhost:3000/.11ty/reload-client.js:20
+[   67373ms] [LOG] [11ty][05:16:13.210 UTC] Connected @ http://localhost:3000/.11ty/reload-client.js:20
+[   67422ms] [LOG] [11ty][05:16:13.259 UTC] Connected @ http://localhost:3000/.11ty/reload-client.js:20
+[   83687ms] [LOG] [11ty][05:16:29.525 UTC] Page reload initiated. @ http://localhost:3000/.11ty/reload-client.js:20
+[   83751ms] [LOG] [11ty][05:16:29.588 UTC] Connected @ http://localhost:3000/.11ty/reload-client.js:20
+[   83794ms] [LOG] [11ty][05:16:29.632 UTC] Connected @ http://localhost:3000/.11ty/reload-client.js:20
+[  238631ms] [LOG] [11ty][05:19:04.469 UTC] Page reload initiated. @ http://localhost:3000/.11ty/reload-client.js:20
+[  238706ms] [LOG] [11ty][05:19:04.544 UTC] Connected @ http://localhost:3000/.11ty/reload-client.js:20
+[  238707ms] [LOG] [11ty][05:19:04.545 UTC] Connected @ http://localhost:3000/.11ty/reload-client.js:20
+[  244706ms] [LOG] [11ty][05:19:10.544 UTC] Page reload initiated. @ http://localhost:3000/.11ty/reload-client.js:20
+[  244765ms] [LOG] [11ty][05:19:10.603 UTC] Connected @ http://localhost:3000/.11ty/reload-client.js:20
+[  244811ms] [LOG] [11ty][05:19:10.648 UTC] Connected @ http://localhost:3000/.11ty/reload-client.js:20
+[  252128ms] [LOG] [11ty][05:19:17.966 UTC] Page reload initiated. @ http://localhost:3000/.11ty/reload-client.js:20
+[  252184ms] [LOG] [11ty][05:19:18.022 UTC] Connected @ http://localhost:3000/.11ty/reload-client.js:20
+[  252232ms] [LOG] [11ty][05:19:18.069 UTC] Connected @ http://localhost:3000/.11ty/reload-client.js:20
+[  262149ms] [LOG] [11ty][05:19:27.987 UTC] Page reload initiated. @ http://localhost:3000/.11ty/reload-client.js:20
+[  262214ms] [LOG] [11ty][05:19:28.052 UTC] Connected @ http://localhost:3000/.11ty/reload-client.js:20
+[  262259ms] [LOG] [11ty][05:19:28.096 UTC] Connected @ http://localhost:3000/.11ty/reload-client.js:20
+[  325087ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3000/dist/js/tabler-theme.min.js?1781043592:0
+[  325087ms] [ERROR] Refused to execute script from 'http://localhost:3000/dist/js/tabler-theme.min.js?1781043592' because its MIME type ('text/html') is not executable, and strict MIME type checking is enabled. @ http://localhost:3000/#overview:0
+[  325099ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3000/dist/js/tabler.min.js?1781043593:0
+[  325100ms] [ERROR] Refused to execute script from 'http://localhost:3000/dist/js/tabler.min.js?1781043593' because its MIME type ('text/html') is not executable, and strict MIME type checking is enabled. @ http://localhost:3000/#overview:599
+[  325120ms] [LOG] [11ty][05:20:30.958 UTC] Connected @ http://localhost:3000/.11ty/reload-client.js:20
+[  496152ms] [LOG] [11ty][05:23:21.989 UTC] Connected @ http://localhost:3000/.11ty/reload-client.js:20
+[  498537ms] [LOG] [11ty][05:23:24.374 UTC] Connected @ http://localhost:3000/.11ty/reload-client.js:20
+[  500583ms] [LOG] [11ty][05:23:26.421 UTC] Connected @ http://localhost:3000/.11ty/reload-client.js:20
+[  508832ms] [LOG] [11ty][05:23:34.669 UTC] Connected @ http://localhost:3000/.11ty/reload-client.js:20
+[  536058ms] [LOG] [11ty][05:24:01.896 UTC] Connected @ http://localhost:3000/.11ty/reload-client.js:20
+[  633611ms] [LOG] [11ty][05:25:39.448 UTC] Page reload initiated. @ http://localhost:3000/.11ty/reload-client.js:20
+[  634407ms] [LOG] [11ty][05:25:40.245 UTC] Connected @ http://localhost:3000/.11ty/reload-client.js:20
+[  634409ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3000/api/statistics?limit=100:0
+[  634409ms] [ERROR] Error: API returned HTTP 404
+    at loadStatistics (http://localhost:3000/:582:11) @ http://localhost:3000/:615
+[  634692ms] [LOG] [11ty][05:25:40.529 UTC] Connected @ http://localhost:3000/.11ty/reload-client.js:20
+[  639448ms] [LOG] [11ty][05:25:45.286 UTC] Page reload initiated. @ http://localhost:3000/.11ty/reload-client.js:20
+[  640362ms] [ERROR] Refused to apply style from 'http://localhost:3000/preview/css/demo.css?1781043945' because its MIME type ('text/html') is not a supported stylesheet MIME type, and strict MIME checking is enabled. @ http://localhost:3000/#overview:0
+[  640373ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3000/preview/js/demo.js:0
+[  640384ms] [ERROR] Refused to execute script from 'http://localhost:3000/preview/js/demo.js' because its MIME type ('text/html') is not executable, and strict MIME type checking is enabled. @ http://localhost:3000/#overview:0
+[  640399ms] [LOG] [11ty][05:25:46.237 UTC] Connected @ http://localhost:3000/.11ty/reload-client.js:20
+[  640429ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3000/api/statistics?limit=100:0
+[  640429ms] [ERROR] Error: API returned HTTP 404
+    at loadStatistics (http://localhost:3000/:582:11) @ http://localhost:3000/:615
+[  640637ms] [LOG] [11ty][05:25:46.475 UTC] Connected @ http://localhost:3000/.11ty/reload-client.js:20
+[  645435ms] [LOG] [11ty][05:25:51.273 UTC] Page reload initiated. @ http://localhost:3000/.11ty/reload-client.js:20
+[  645462ms] [ERROR] Refused to apply style from 'http://localhost:3000/preview/css/demo.css?1781043951' because its MIME type ('text/html') is not a supported stylesheet MIME type, and strict MIME checking is enabled. @ http://localhost:3000/#overview:0
+[  645470ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3000/preview/js/demo.js:0
+[  645471ms] [ERROR] Refused to execute script from 'http://localhost:3000/preview/js/demo.js' because its MIME type ('text/html') is not executable, and strict MIME type checking is enabled. @ http://localhost:3000/#overview:0
+[  645487ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3000/api/statistics?limit=100:0
+[  645487ms] [LOG] [11ty][05:25:51.325 UTC] Connected @ http://localhost:3000/.11ty/reload-client.js:20
+[  645487ms] [ERROR] Error: API returned HTTP 404
+    at loadStatistics (http://localhost:3000/:582:11) @ http://localhost:3000/:615
+[  645801ms] [LOG] [11ty][05:25:51.638 UTC] Connected @ http://localhost:3000/.11ty/reload-client.js:20
+[  722816ms] [LOG] [11ty][05:27:08.653 UTC] Connected @ http://localhost:3000/.11ty/reload-client.js:20
+[  725964ms] [LOG] [11ty][05:27:11.802 UTC] Disconnected @ http://localhost:3000/.11ty/reload-client.js:20
+[  779082ms] [LOG] [11ty][05:28:04.919 UTC] Reconnecting… @ http://localhost:3000/.11ty/reload-client.js:20

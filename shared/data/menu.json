@@ -1,0 +1,22 @@
+{
+  "overview": {
+    "url": "#overview",
+    "title": "Overview",
+    "icon": "layout-dashboard"
+  },
+  "top-staff": {
+    "url": "#top-staff",
+    "title": "Top Staff",
+    "icon": "trophy"
+  },
+  "activity-chart": {
+    "url": "#activity-chart",
+    "title": "Activity Graph",
+    "icon": "chart-line"
+  },
+  "monthly": {
+    "url": "#top-staff",
+    "title": "Monthly Activity",
+    "icon": "calendar-stats"
+  }
+}
