@@ -1,4 +1,14 @@
 {
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": null,
+  "installCommand": "pnpm install --frozen-lockfile",
+  "buildCommand": "pnpm --filter @tabler/core build && pnpm --filter @tabler/preview build",
+  "outputDirectory": "dist",
+  "functions": {
+    "api/statistics.mjs": {
+      "maxDuration": 10
+    }
+  },
   "rewrites": [
     {
       "source": "/stats/js/script.js",
@@ -7,10 +17,6 @@
     {
       "source": "/stats/event",
       "destination": "https://plausible.io/api/event"
-    },
-    {
-      "source": "/(.*)",
-      "destination": "/error-404.html"
     }
   ],
   "redirects": [

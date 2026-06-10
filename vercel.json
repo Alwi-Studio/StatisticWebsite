@@ -1,0 +1,12 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": null,
+  "installCommand": "pnpm install --frozen-lockfile",
+  "buildCommand": "pnpm --filter @tabler/core build && pnpm --filter @tabler/preview build",
+  "outputDirectory": "preview/dist",
+  "functions": {
+    "api/statistics.mjs": {
+      "maxDuration": 10
+    }
+  }
+}

@@ -243,6 +243,18 @@
 			});
 		}
 
+		function errorMessage(error, fallback) {
+			if (typeof error === "string") return error;
+			if (error?.message) return error.message;
+			if (error?.detail) return errorMessage(error.detail, fallback);
+			if (error?.error) return errorMessage(error.error, fallback);
+			try {
+				return JSON.stringify(error);
+			} catch {
+				return fallback;
+			}
+		}
+
 		async function loadStatistics(period) {
 			errorAlert.classList.add("d-none");
 			activityTable.innerHTML = '<tr><td colspan="4" class="text-center text-secondary py-5">Loading staff activity...</td></tr>';
@@ -256,7 +268,9 @@
 			});
 			if (!response.ok) {
 				const apiError = await response.json().catch(() => ({}));
-				throw new Error(apiError.detail || apiError.error || `API returned HTTP ${response.status}`);
+				const fallback = `API returned HTTP ${response.status}`;
+				const message = errorMessage(apiError, fallback);
+				throw new Error(apiError.code ? `${message} (${apiError.code})` : message);
 			}
 
 			const statistics = await response.json();

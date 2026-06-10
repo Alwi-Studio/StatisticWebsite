@@ -189,7 +189,8 @@ export default async function handler(request, response) {
 		console.error("Unable to load player statistics", error);
 		return response.status(500).json({
 			error: "Unable to load player statistics",
-			...(process.env.STATISTICS_LOCAL_DEVELOPMENT === "true" ? { detail: error.message } : {}),
+			code: error.code || "STATISTICS_API_ERROR",
+			detail: error.message || "Unknown database error",
 		});
 	} finally {
 		await connection?.end();
