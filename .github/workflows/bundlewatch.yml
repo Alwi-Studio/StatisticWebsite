@@ -33,7 +33,7 @@ jobs:
           node-version: "${{ env.NODE }}"
      
       - name: Install PNPM
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@v6
 
       - name: Set up Bundler
         uses: ruby/setup-ruby@v1

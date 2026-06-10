@@ -42,7 +42,7 @@ jobs:
           node-version: "${{ env.NODE }}"
 
       - name: Install PNPM
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@v6
 
       - name: Get installed Playwright version
         id: playwright-version
