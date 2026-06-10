@@ -136,6 +136,11 @@ export default async function handler(request, response) {
 		const [summaryRows] = await connection.query(
 			`SELECT COUNT(DISTINCT ${uuidColumn}) AS totalStaff,
 				COALESCE(SUM(${amountChatColumn}), 0) AS totalChat,
+				COALESCE(SUM(${lastActivityColumn}), 0) AS totalActivity,
+				(
+					COALESCE(SUM(${amountChatColumn}), 0)
+					+ COALESCE(SUM(${lastActivityColumn}), 0) * 2
+				) AS totalPoints,
 				COUNT(DISTINCT ${dayColumn}) AS trackedDays
 			FROM ${table}
 			WHERE ${yearColumn} = ? AND ${monthColumn} = ?`,
@@ -145,18 +150,26 @@ export default async function handler(request, response) {
 			`SELECT ${uuidColumn} AS uuid,
 				MAX(${nameColumn}) AS name,
 				COALESCE(SUM(${lastActivityColumn}), 0) AS lastActivity,
-				COALESCE(SUM(${amountChatColumn}), 0) AS amountChat
+				COALESCE(SUM(${amountChatColumn}), 0) AS amountChat,
+				(
+					COALESCE(SUM(${amountChatColumn}), 0)
+					+ COALESCE(SUM(${lastActivityColumn}), 0) * 2
+				) AS points
 			FROM ${table}
 			WHERE ${yearColumn} = ? AND ${monthColumn} = ?
 			GROUP BY ${uuidColumn}
-			ORDER BY amountChat DESC, lastActivity DESC
+			ORDER BY points DESC, amountChat DESC, lastActivity DESC
 			LIMIT ?`,
 			[...periodParameters, limit],
 		);
 		const [chartRows] = await connection.query(
 			`SELECT ${dayColumn} AS day,
 				COALESCE(SUM(${amountChatColumn}), 0) AS amountChat,
-				COALESCE(SUM(${lastActivityColumn}), 0) AS activityTime
+				COALESCE(SUM(${lastActivityColumn}), 0) AS activityTime,
+				(
+					COALESCE(SUM(${amountChatColumn}), 0)
+					+ COALESCE(SUM(${lastActivityColumn}), 0) * 2
+				) AS points
 			FROM ${table}
 			WHERE ${yearColumn} = ? AND ${monthColumn} = ?
 			GROUP BY ${dayColumn}
@@ -175,7 +188,9 @@ export default async function handler(request, response) {
 		return response.status(200).json({
 			summary: {
 				totalStaff: Number(summary.totalStaff),
-				totalChat: summary.totalChat,
+				totalChat: Number(summary.totalChat),
+				totalActivity: Number(summary.totalActivity),
+				totalPoints: Number(summary.totalPoints),
 				trackedDays: Number(summary.trackedDays),
 			},
 			top: topRows,
