@@ -5,6 +5,8 @@ const DEFAULT_LIMIT = 10;
 const MAX_LIMIT = 100;
 const ACTIVITY_RANGES = new Set(["month", "today", "day", "week"]);
 const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
+const ACTIVITY_POINT_INTERVAL = 60000;
+const ACTIVITY_POINTS_PER_INTERVAL = 2;
 
 function requiredEnvironment(name) {
 	const value = process.env[name];
@@ -137,6 +139,10 @@ export default async function handler(request, response) {
 		const dayColumn = identifier("MYSQL_DAY_COLUMN", "day");
 		const monthColumn = identifier("MYSQL_MONTH_COLUMN", "month");
 		const yearColumn = identifier("MYSQL_YEAR_COLUMN", "year");
+		const pointsExpression = `(
+			COALESCE(SUM(${amountChatColumn}), 0)
+			+ FLOOR(COALESCE(SUM(${lastActivityColumn}), 0) / ${ACTIVITY_POINT_INTERVAL}) * ${ACTIVITY_POINTS_PER_INTERVAL}
+		)`;
 		const limit = leaderboardLimit(request);
 		const requestedMonth = optionalPositiveInteger(request.query?.month, "month", 12);
 		const requestedYear = optionalPositiveInteger(request.query?.year, "year");
@@ -199,10 +205,7 @@ export default async function handler(request, response) {
 			`SELECT COUNT(DISTINCT ${uuidColumn}) AS totalStaff,
 				COALESCE(SUM(${amountChatColumn}), 0) AS totalChat,
 				COALESCE(SUM(${lastActivityColumn}), 0) AS totalActivity,
-				(
-					COALESCE(SUM(${amountChatColumn}), 0)
-					+ COALESCE(SUM(${lastActivityColumn}), 0) * 2
-				) AS totalPoints,
+				${pointsExpression} AS totalPoints,
 				COUNT(DISTINCT ${dayColumn}) AS trackedDays
 			FROM ${table}
 			WHERE ${periodFilter}`,
@@ -213,10 +216,7 @@ export default async function handler(request, response) {
 				MAX(${nameColumn}) AS name,
 				COALESCE(SUM(${lastActivityColumn}), 0) AS lastActivity,
 				COALESCE(SUM(${amountChatColumn}), 0) AS amountChat,
-				(
-					COALESCE(SUM(${amountChatColumn}), 0)
-					+ COALESCE(SUM(${lastActivityColumn}), 0) * 2
-				) AS points
+				${pointsExpression} AS points
 			FROM ${table}
 			WHERE ${periodFilter}
 			GROUP BY ${uuidColumn}
@@ -230,10 +230,7 @@ export default async function handler(request, response) {
 				${dayColumn} AS day,
 				COALESCE(SUM(${amountChatColumn}), 0) AS amountChat,
 				COALESCE(SUM(${lastActivityColumn}), 0) AS activityTime,
-				(
-					COALESCE(SUM(${amountChatColumn}), 0)
-					+ COALESCE(SUM(${lastActivityColumn}), 0) * 2
-				) AS points
+				${pointsExpression} AS points
 			FROM ${table}
 			WHERE ${periodFilter}
 			GROUP BY ${yearColumn}, ${monthColumn}, ${dayColumn}

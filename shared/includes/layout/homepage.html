@@ -13,7 +13,7 @@
 			<div class="card-header">
 				<div>
 					<h3 class="card-title">Top Staff Activity</h3>
-					<p class="card-subtitle" data-range-description>Ranked by activity for the selected month</p>
+					<p class="card-subtitle" data-range-description>Ranked by points for the selected month</p>
 				</div>
 				<div class="card-actions d-flex flex-wrap align-items-center gap-2">
 					<select class="form-select" aria-label="Activity month" data-period-select disabled>
@@ -36,7 +36,7 @@
 						<tr>
 							<th class="w-1">Rank</th>
 							<th>Staff Member</th>
-							<th class="text-end">Chat</th>
+							<th class="text-end">Points</th>
 							<th class="text-end">Activity</th>
 						</tr>
 					</thead>
@@ -66,9 +66,9 @@
 			<div class="col-sm-6">
 				<div class="card">
 					<div class="card-body">
-						<div class="subheader">Total Chat Messages</div>
-						<div class="h1 mb-0 mt-2" data-statistic="totalChat">...</div>
-						<div class="text-secondary mt-2">Messages recorded across all days</div>
+						<div class="subheader">Total Points</div>
+						<div class="h1 mb-0 mt-2" data-statistic="totalPoints">...</div>
+						<div class="text-secondary mt-2">Combined score from staff activity and participation</div>
 					</div>
 				</div>
 			</div>
@@ -98,7 +98,7 @@
 					<div class="card-header">
 						<div>
 							<h3 class="card-title">Daily Activity</h3>
-							<p class="card-subtitle" data-chart-description>Chat messages and activity time for the selected month</p>
+							<p class="card-subtitle" data-chart-description>Points and activity time for the selected month</p>
 						</div>
 					</div>
 					<div class="card-body">
@@ -172,8 +172,8 @@
 				dataLabels: { enabled: false },
 				series: [
 					{
-						name: "Chat Messages",
-						data: points.map((point) => Number(point.amountChat)),
+						name: "Points",
+						data: points.map((point) => Number(point.points)),
 					},
 					{
 						name: "Activity Hours",
@@ -204,7 +204,7 @@
 				},
 				yaxis: [
 					{
-						title: { text: "Messages" },
+						title: { text: "Points" },
 						min: 0,
 						decimalsInFloat: 0,
 						labels: {
@@ -224,7 +224,7 @@
 				tooltip: {
 					shared: true,
 					y: [
-						{ formatter: (value) => `${numberFormatter.format(Math.round(value))} messages` },
+						{ formatter: (value) => `${numberFormatter.format(Math.round(value))} points` },
 						{ formatter: (value) => `${value.toFixed(1)} hours` },
 					],
 				},
@@ -245,18 +245,18 @@
 			const row = document.createElement("tr");
 			const rank = document.createElement("td");
 			const name = document.createElement("td");
-			const amountChat = document.createElement("td");
+			const points = document.createElement("td");
 			const lastActivity = document.createElement("td");
 
 			rank.textContent = numberFormatter.format(index + 1);
 			name.textContent = activity.name || "Unknown staff member";
 			name.className = "fw-bold";
-			amountChat.textContent = numberFormatter.format(activity.amountChat);
-			amountChat.className = "text-end";
+			points.textContent = numberFormatter.format(activity.points);
+			points.className = "text-end";
 			lastActivity.textContent = formatDuration(activity.lastActivity);
 			lastActivity.className = "text-end";
 
-			row.append(rank, name, amountChat, lastActivity);
+			row.append(rank, name, points, lastActivity);
 			return row;
 		}
 
@@ -387,7 +387,7 @@
 
 			const statistics = await response.json();
 			setStatistic("totalStaff", numberFormatter.format(statistics.summary.totalStaff));
-			setStatistic("totalChat", numberFormatter.format(statistics.summary.totalChat));
+			setStatistic("totalPoints", numberFormatter.format(statistics.summary.totalPoints));
 			setStatistic("trackedDays", numberFormatter.format(statistics.summary.trackedDays));
 			setStatistic("storageBytes", formatBytes(statistics.storageBytes));
 			renderChart(statistics.chart, statistics.selectedRange);
@@ -414,8 +414,8 @@
 			rangeSelect.disabled = false;
 			updateDateInputs();
 			updateWeekInput();
-			rangeDescription.textContent = `Ranked by activity ${selectedRangeLabel}`;
-			chartDescription.textContent = `Chat messages and activity time ${selectedRangeLabel}`;
+			rangeDescription.textContent = `Ranked by points ${selectedRangeLabel}`;
+			chartDescription.textContent = `Points and activity time ${selectedRangeLabel}`;
 			activityTable.replaceChildren(...statistics.top.map(activityRow));
 			if (statistics.top.length === 0) {
 				activityTable.innerHTML = '<tr><td colspan="4" class="text-center text-secondary py-5">No staff activity found.</td></tr>';
