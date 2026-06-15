@@ -13,12 +13,21 @@
 			<div class="card-header">
 				<div>
 					<h3 class="card-title">Top Staff Activity</h3>
-					<p class="card-subtitle">Ranked by chat messages for the selected month</p>
+					<p class="card-subtitle" data-range-description>Ranked by activity for the selected month</p>
 				</div>
-				<div class="card-actions d-flex align-items-center gap-2">
+				<div class="card-actions d-flex flex-wrap align-items-center gap-2">
 					<select class="form-select" aria-label="Activity month" data-period-select disabled>
 						<option>Loading months...</option>
 					</select>
+					<select class="form-select" aria-label="Activity range" data-range-select disabled>
+						<option value="month" selected>Whole month</option>
+						<option value="today">Today</option>
+						<option value="day">Date range</option>
+						<option value="week">Week of month</option>
+					</select>
+					<input class="form-control d-none" type="date" aria-label="Activity start date" data-date-from-select>
+					<input class="form-control d-none" type="date" aria-label="Activity end date" data-date-to-select>
+					<select class="form-select d-none" aria-label="Week of month" data-week-select disabled></select>
 				</div>
 			</div>
 			<div class="table-responsive top-staff-table">
@@ -89,7 +98,7 @@
 					<div class="card-header">
 						<div>
 							<h3 class="card-title">Daily Activity</h3>
-							<p class="card-subtitle">Chat messages and activity time during the selected month</p>
+							<p class="card-subtitle" data-chart-description>Chat messages and activity time for the selected month</p>
 						</div>
 					</div>
 					<div class="card-body">
@@ -108,6 +117,12 @@
 		const errorAlert = document.querySelector("[data-statistics-error]");
 		const activityTable = document.querySelector("[data-statistics-activity]");
 		const periodSelect = document.querySelector("[data-period-select]");
+		const rangeSelect = document.querySelector("[data-range-select]");
+		const dateFromSelect = document.querySelector("[data-date-from-select]");
+		const dateToSelect = document.querySelector("[data-date-to-select]");
+		const weekSelect = document.querySelector("[data-week-select]");
+		const rangeDescription = document.querySelector("[data-range-description]");
+		const chartDescription = document.querySelector("[data-chart-description]");
 		let dailyChart;
 
 		function setStatistic(name, value) {
@@ -137,7 +152,16 @@
 			return `${size.toFixed(size >= 10 ? 1 : 2)} ${units[unit]}`;
 		}
 
-		function renderChart(points) {
+		function chartDateLabel(point, range) {
+			if (range === "month") return `Day ${point.day}`;
+			return new Date(point.year, point.month - 1, point.day).toLocaleDateString(undefined, {
+				weekday: range === "week" ? "short" : undefined,
+				month: "short",
+				day: "numeric",
+			});
+		}
+
+		function renderChart(points, range) {
 			const options = {
 				chart: {
 					type: "area",
@@ -176,7 +200,7 @@
 					},
 				},
 				xaxis: {
-					categories: points.map((point) => `Day ${point.day}`),
+					categories: points.map((point) => chartDateLabel(point, range)),
 				},
 				yaxis: [
 					{
@@ -236,11 +260,86 @@
 			return row;
 		}
 
+		function rangeLabel(range) {
+			return {
+				month: "the selected month",
+				today: "today",
+				day: "the selected date range",
+				week: "the selected week",
+			}[range];
+		}
+
 		function periodLabel(period) {
 			return new Date(period.year, period.month - 1).toLocaleDateString(undefined, {
 				month: "long",
 				year: "numeric",
 			});
+		}
+
+		function selectedPeriod() {
+			const [year, month] = periodSelect.value.split("-").map(Number);
+			if (!Number.isInteger(year) || !Number.isInteger(month)) {
+				return null;
+			}
+			return { year, month };
+		}
+
+		function localDateValue(date = new Date()) {
+			const year = date.getFullYear();
+			const month = String(date.getMonth() + 1).padStart(2, "0");
+			const day = String(date.getDate()).padStart(2, "0");
+			return `${year}-${month}-${day}`;
+		}
+
+		function updateDateInputs() {
+			const needsDate = rangeSelect.value === "day";
+			dateFromSelect.classList.toggle("d-none", !needsDate);
+			dateToSelect.classList.toggle("d-none", !needsDate);
+			dateFromSelect.disabled = !needsDate;
+			dateToSelect.disabled = !needsDate;
+			if (needsDate) {
+				const period = selectedPeriod();
+				if (!period) return;
+				const today = new Date();
+				const month = String(period.month).padStart(2, "0");
+				const lastDay = new Date(period.year, period.month, 0).getDate();
+				const minimum = `${period.year}-${month}-01`;
+				const maximum = `${period.year}-${month}-${lastDay}`;
+				const defaultDate = today.getFullYear() === period.year && today.getMonth() + 1 === period.month
+					? localDateValue(today)
+					: minimum;
+				for (const input of [dateFromSelect, dateToSelect]) {
+					input.min = minimum;
+					input.max = maximum;
+					if (!input.value || input.value < minimum || input.value > maximum) {
+						input.value = defaultDate;
+					}
+				}
+				if (dateToSelect.value < dateFromSelect.value) {
+					dateToSelect.value = dateFromSelect.value;
+				}
+			}
+		}
+
+		function updateWeekInput() {
+			const needsWeek = rangeSelect.value === "week";
+			weekSelect.classList.toggle("d-none", !needsWeek);
+			weekSelect.disabled = !needsWeek;
+			if (!needsWeek) return;
+
+			const period = selectedPeriod();
+			if (!period) return;
+			const daysInMonth = new Date(period.year, period.month, 0).getDate();
+			const weekCount = Math.ceil(daysInMonth / 7);
+			const selectedWeek = Number(weekSelect.value) || 1;
+			weekSelect.replaceChildren(...Array.from({ length: weekCount }, (_, index) => {
+				const week = index + 1;
+				const option = document.createElement("option");
+				option.value = week;
+				option.textContent = `Week ${week}`;
+				option.selected = week === selectedWeek;
+				return option;
+			}));
 		}
 
 		function errorMessage(error, fallback) {
@@ -255,13 +354,26 @@
 			}
 		}
 
-		async function loadStatistics(period) {
+		async function loadStatistics() {
 			errorAlert.classList.add("d-none");
 			activityTable.innerHTML = '<tr><td colspan="4" class="text-center text-secondary py-5">Loading staff activity...</td></tr>';
-			const query = new URLSearchParams({ limit: "100" });
+			periodSelect.disabled = true;
+			rangeSelect.disabled = true;
+			dateFromSelect.disabled = true;
+			dateToSelect.disabled = true;
+			weekSelect.disabled = true;
+			const period = selectedPeriod();
+			const query = new URLSearchParams({ limit: "100", range: rangeSelect.value });
 			if (period) {
 				query.set("year", period.year);
 				query.set("month", period.month);
+			}
+			if (rangeSelect.value === "day") {
+				query.set("dateFrom", dateFromSelect.value);
+				query.set("dateTo", dateToSelect.value);
+			}
+			if (rangeSelect.value === "week") {
+				query.set("week", weekSelect.value);
 			}
 			const response = await fetch(`/api/statistics?${query}`, {
 				headers: { Accept: "application/json" },
@@ -278,14 +390,19 @@
 			setStatistic("totalChat", numberFormatter.format(statistics.summary.totalChat));
 			setStatistic("trackedDays", numberFormatter.format(statistics.summary.trackedDays));
 			setStatistic("storageBytes", formatBytes(statistics.storageBytes));
-			renderChart(statistics.chart);
+			renderChart(statistics.chart, statistics.selectedRange);
 
-			activityTable.replaceChildren(...statistics.top.map(activityRow));
-			if (statistics.top.length === 0) {
-				activityTable.innerHTML = '<tr><td colspan="4" class="text-center text-secondary py-5">No staff activity found.</td></tr>';
+			const selectedRangeLabel = rangeLabel(statistics.selectedRange);
+			rangeSelect.value = statistics.selectedRange;
+			dateFromSelect.value = statistics.selectedDateFrom || dateFromSelect.value;
+			dateToSelect.value = statistics.selectedDateTo || dateToSelect.value;
+			weekSelect.value = statistics.selectedWeek || weekSelect.value;
+			const availablePeriods = [...statistics.periods];
+			if (statistics.selectedPeriod && !availablePeriods.some((period) =>
+				period.year === statistics.selectedPeriod.year && period.month === statistics.selectedPeriod.month)) {
+				availablePeriods.unshift(statistics.selectedPeriod);
 			}
-
-			periodSelect.replaceChildren(...statistics.periods.map((availablePeriod) => {
+			periodSelect.replaceChildren(...availablePeriods.map((availablePeriod) => {
 				const option = document.createElement("option");
 				option.value = `${availablePeriod.year}-${availablePeriod.month}`;
 				option.textContent = periodLabel(availablePeriod);
@@ -293,14 +410,55 @@
 					&& availablePeriod.month === statistics.selectedPeriod?.month;
 				return option;
 			}));
-			periodSelect.disabled = statistics.periods.length === 0;
+			periodSelect.disabled = availablePeriods.length === 0;
+			rangeSelect.disabled = false;
+			updateDateInputs();
+			updateWeekInput();
+			rangeDescription.textContent = `Ranked by activity ${selectedRangeLabel}`;
+			chartDescription.textContent = `Chat messages and activity time ${selectedRangeLabel}`;
+			activityTable.replaceChildren(...statistics.top.map(activityRow));
+			if (statistics.top.length === 0) {
+				activityTable.innerHTML = '<tr><td colspan="4" class="text-center text-secondary py-5">No staff activity found.</td></tr>';
+			}
+
 			document.querySelector("[data-statistics-updated]").textContent =
 				`Updated ${new Date(statistics.generatedAt).toLocaleString()}`;
 		}
 
+		rangeSelect.addEventListener("change", function () {
+			if (this.value === "today") {
+				const today = new Date();
+				periodSelect.value = `${today.getFullYear()}-${today.getMonth() + 1}`;
+			}
+			updateDateInputs();
+			updateWeekInput();
+			loadStatistics().catch(showError);
+		});
+
 		periodSelect.addEventListener("change", function () {
-			const [year, month] = this.value.split("-").map(Number);
-			loadStatistics({ year, month }).catch(showError);
+			if (rangeSelect.value === "today") {
+				rangeSelect.value = "month";
+			}
+			dateFromSelect.value = "";
+			dateToSelect.value = "";
+			updateDateInputs();
+			updateWeekInput();
+			loadStatistics().catch(showError);
+		});
+
+		dateFromSelect.addEventListener("change", function () {
+			if (dateToSelect.value < this.value) {
+				dateToSelect.value = this.value;
+			}
+			loadStatistics().catch(showError);
+		});
+
+		dateToSelect.addEventListener("change", function () {
+			loadStatistics().catch(showError);
+		});
+
+		weekSelect.addEventListener("change", function () {
+			loadStatistics().catch(showError);
 		});
 
 		function showError(error) {
@@ -308,6 +466,10 @@
 			errorAlert.classList.remove("d-none");
 			errorAlert.querySelector("[data-statistics-error-message]").textContent = error.message;
 			activityTable.innerHTML = '<tr><td colspan="4" class="text-center text-danger py-5">Unable to load staff activity.</td></tr>';
+			periodSelect.disabled = false;
+			rangeSelect.disabled = false;
+			updateDateInputs();
+			updateWeekInput();
 			document.querySelector("[data-statistics-updated]").textContent = "Unavailable";
 		}
 

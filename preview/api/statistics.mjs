@@ -3,6 +3,8 @@ import mysql from "mysql2/promise";
 const IDENTIFIER_PATTERN = /^[A-Za-z_][A-Za-z0-9_]*$/;
 const DEFAULT_LIMIT = 10;
 const MAX_LIMIT = 100;
+const ACTIVITY_RANGES = new Set(["month", "today", "day", "week"]);
+const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
 
 function requiredEnvironment(name) {
 	const value = process.env[name];
@@ -45,6 +47,38 @@ function positiveInteger(value, name, maximum) {
 		throw new Error(`${name} must be a valid positive integer`);
 	}
 	return parsed;
+}
+
+function optionalPositiveInteger(value, name, maximum) {
+	if (value === undefined || value === "" || value === "undefined" || value === "null" || value === "NaN") {
+		return null;
+	}
+	return positiveInteger(value, name, maximum);
+}
+
+function activityRange(value) {
+	const range = value || "month";
+	if (!ACTIVITY_RANGES.has(range)) {
+		throw new Error("range must be month, today, day, or week");
+	}
+	return range;
+}
+
+function activityDate(value, name, range) {
+	if (range !== "day") {
+		return null;
+	}
+	if (!DATE_PATTERN.test(value || "")) {
+		throw new Error(`${name} must use the YYYY-MM-DD format`);
+	}
+	return value;
+}
+
+function activityWeek(value, range) {
+	if (range !== "week") {
+		return null;
+	}
+	return positiveInteger(value, "week", 5) || 1;
 }
 
 function databaseConfig() {
@@ -104,35 +138,63 @@ export default async function handler(request, response) {
 		const monthColumn = identifier("MYSQL_MONTH_COLUMN", "month");
 		const yearColumn = identifier("MYSQL_YEAR_COLUMN", "year");
 		const limit = leaderboardLimit(request);
-		const requestedMonth = positiveInteger(request.query?.month, "month", 12);
-		const requestedYear = positiveInteger(request.query?.year, "year");
+		const requestedMonth = optionalPositiveInteger(request.query?.month, "month", 12);
+		const requestedYear = optionalPositiveInteger(request.query?.year, "year");
+		const selectedRange = activityRange(request.query?.range);
+		const selectedDateFrom = activityDate(request.query?.dateFrom || request.query?.date, "dateFrom", selectedRange);
+		const selectedDateTo = activityDate(request.query?.dateTo || selectedDateFrom, "dateTo", selectedRange);
+		const selectedWeek = activityWeek(request.query?.week, selectedRange);
+		if (selectedDateFrom && selectedDateTo && selectedDateFrom > selectedDateTo) {
+			throw new Error("dateFrom must be before or equal to dateTo");
+		}
 
 		connection = await openConnection();
 
+		const [currentPeriodRows] = await connection.query(
+			`SELECT YEAR(CURRENT_DATE()) AS year, MONTH(CURRENT_DATE()) AS month`,
+		);
 		const [periodRows] = await connection.query(
 			`SELECT DISTINCT ${yearColumn} AS year, ${monthColumn} AS month
 			FROM ${table}
 			ORDER BY ${yearColumn} DESC, ${monthColumn} DESC`,
 		);
-		const latestPeriod = periodRows[0] || null;
-		const selectedPeriod = requestedMonth && requestedYear
+		const selectedPeriod = selectedRange === "today"
+			? currentPeriodRows[0]
+			: requestedMonth && requestedYear
 			? { month: requestedMonth, year: requestedYear }
-			: latestPeriod;
+			: periodRows[0] || null;
 
 		if (!selectedPeriod) {
 			response.setHeader("Cache-Control", "s-maxage=30, stale-while-revalidate=300");
 			return response.status(200).json({
-				summary: { totalStaff: 0, totalChat: 0, trackedDays: 0 },
+				summary: { totalStaff: 0, totalChat: 0, totalActivity: 0, totalPoints: 0, trackedDays: 0 },
 				top: [],
 				chart: [],
 				storageBytes: 0,
 				periods: [],
 				selectedPeriod: null,
+				selectedRange,
+				selectedDateFrom,
+				selectedDateTo,
+				selectedWeek,
 				generatedAt: new Date().toISOString(),
 			});
 		}
 
+		const dateExpression = `STR_TO_DATE(CONCAT(${yearColumn}, '-', ${monthColumn}, '-', ${dayColumn}), '%Y-%c-%e')`;
+		let periodFilter = `${yearColumn} = ? AND ${monthColumn} = ?`;
 		const periodParameters = [selectedPeriod.year, selectedPeriod.month];
+		if (selectedRange === "today") {
+			periodFilter += ` AND ${dateExpression} = CURRENT_DATE()`;
+		} else if (selectedRange === "day") {
+			periodFilter += ` AND ${dateExpression} BETWEEN ? AND ?`;
+			periodParameters.push(selectedDateFrom, selectedDateTo);
+		} else if (selectedRange === "week") {
+			const firstDay = (selectedWeek - 1) * 7 + 1;
+			periodFilter += ` AND ${dayColumn} BETWEEN ? AND ?`;
+			periodParameters.push(firstDay, firstDay + 6);
+		}
+
 		const [summaryRows] = await connection.query(
 			`SELECT COUNT(DISTINCT ${uuidColumn}) AS totalStaff,
 				COALESCE(SUM(${amountChatColumn}), 0) AS totalChat,
@@ -143,7 +205,7 @@ export default async function handler(request, response) {
 				) AS totalPoints,
 				COUNT(DISTINCT ${dayColumn}) AS trackedDays
 			FROM ${table}
-			WHERE ${yearColumn} = ? AND ${monthColumn} = ?`,
+			WHERE ${periodFilter}`,
 			periodParameters,
 		);
 		const [topRows] = await connection.query(
@@ -156,14 +218,16 @@ export default async function handler(request, response) {
 					+ COALESCE(SUM(${lastActivityColumn}), 0) * 2
 				) AS points
 			FROM ${table}
-			WHERE ${yearColumn} = ? AND ${monthColumn} = ?
+			WHERE ${periodFilter}
 			GROUP BY ${uuidColumn}
 			ORDER BY points DESC, amountChat DESC, lastActivity DESC
 			LIMIT ?`,
 			[...periodParameters, limit],
 		);
 		const [chartRows] = await connection.query(
-			`SELECT ${dayColumn} AS day,
+			`SELECT ${yearColumn} AS year,
+				${monthColumn} AS month,
+				${dayColumn} AS day,
 				COALESCE(SUM(${amountChatColumn}), 0) AS amountChat,
 				COALESCE(SUM(${lastActivityColumn}), 0) AS activityTime,
 				(
@@ -171,9 +235,9 @@ export default async function handler(request, response) {
 					+ COALESCE(SUM(${lastActivityColumn}), 0) * 2
 				) AS points
 			FROM ${table}
-			WHERE ${yearColumn} = ? AND ${monthColumn} = ?
-			GROUP BY ${dayColumn}
-			ORDER BY ${dayColumn}`,
+			WHERE ${periodFilter}
+			GROUP BY ${yearColumn}, ${monthColumn}, ${dayColumn}
+			ORDER BY ${yearColumn}, ${monthColumn}, ${dayColumn}`,
 			periodParameters,
 		);
 		const [storageRows] = await connection.query(
@@ -198,6 +262,10 @@ export default async function handler(request, response) {
 			storageBytes: storageRows[0]?.bytes || 0,
 			periods: periodRows,
 			selectedPeriod,
+			selectedRange,
+			selectedDateFrom,
+			selectedDateTo,
+			selectedWeek,
 			generatedAt: new Date().toISOString(),
 		});
 	} catch (error) {
